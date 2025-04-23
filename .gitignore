@@ -1,0 +1,17 @@
+
+.env
+data/catalogs.zip
+venv
+draft.py
+ai_processor/__pycache__
+ai_processor_2/__pycache__
+Korix.txt
+input
+output
+streamlit_output
+draft.ipynb
+data
+output_images
+catalogs.zip
+ai_processor_3/__pycache__
+draft
