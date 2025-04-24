@@ -5,7 +5,6 @@ from typing import List, Dict, Any
 import os
 import sys
 import json
-import re
 from mistralai import Mistral
 import datauri
 
@@ -103,40 +102,6 @@ class OCRAnalyzer:
                     self.save_image(image)
 
 
-    def process_file_old(self, pdf_filename: str) -> str:
-        """
-        Process a PDF file with OCR and analyze it using Mistral LLM.
-
-        Args:
-            pdf_filename: Path to the PDF file to process
-
-        Returns:
-            Processed content from the LLM
-        """
-        messages = [
-            {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "text",
-                        "text": self.system_prompt,
-                    },
-                    {
-                        "type": "document_url",
-                        "document_url": self.upload_pdf(pdf_filename),
-                    },
-                ],
-            }
-        ]
-
-        chat_response = self.client.chat.complete(
-            model=self.model,
-            messages=messages,
-        )
-
-        return chat_response.choices[0].message.content
-
-
     def process_file(self, pdf_filename: str, document_analysis=None) -> str:
         """
         Process a PDF file with OCR and analyze it using Mistral LLM.
@@ -227,28 +192,6 @@ class OCRAnalyzer:
         )
         
         return chat_response.choices[0].message.content
-
-
-    def interactive_document_chat_old(self, pdf_filename: str):
-        """
-        Start an interactive chat session about a document.
-        
-        Args:
-            pdf_filename: Path to the PDF file to discuss
-        """
-        print(f"Starting chat about {pdf_filename}. Type 'exit' or 'quit' to end.")
-        print("Loading document...")
-        
-        while True:
-            user_input = input("\nYour question: ")
-            
-            if user_input.lower() in ['exit', 'quit', 'q']:
-                print("Ending chat session.")
-                break
-                
-            print("\nThinking...")
-            response = self.chat_with_document(pdf_filename, user_input)
-            print(f"\nAssistant: {response}")
 
 
     def interactive_document_chat(self, pdf_filename: str, document_analysis=None):
@@ -344,25 +287,6 @@ if __name__ == "__main__":
         ]
     """
 
-    prompt_pages_description_claude = """You are an expert document analyzer specializing in technical documentation.
-        Your task is to analyze the provided document content and return a concise description for each page in French.
-
-        The document contains exactly 10 pages.
-
-        Return a list of dictionaries with the following structure:
-        [
-            {
-                "page": "page number",
-                "title": "main title of the page",
-                "description": "brief description of the page content"
-            }
-        ]
-
-        Important: Pay careful attention to page transitions, unique content identifiers, and distinct sections. Each page should be analyzed independently based on its specific content.
-        
-        Explain how you determine the page you're currently in
-        """
-
     prompt_1 = """Quel format de balisage ou de structuration utilisez-vous pour identifier les différentes pages du document que je vous ai soumis? 
         Utilisez-vous:
         - Des balises XML (comme <document_content page="X">)
@@ -371,7 +295,6 @@ if __name__ == "__main__":
         - Une autre méthode de délimitation des pages
 
         Merci de décrire précisément comment vous déterminez où commence et se termine chaque page dans le document."""
-
 
     prompt_2 = """I'm working with Mistral OCR to extract technical sheets from a catalog, but I'm experiencing issues with page handling. Please analyze the following details to suggest targeted solutions:
         Describe exactly how Mistral OCR is mishandling the pages (e.g., merging content from different pages, skipping pages, misidentifying page boundaries)
@@ -384,39 +307,9 @@ if __name__ == "__main__":
 
         This information will help me identify the most effective solutions while working within your constraint of using only Mistral OCR."""
 
-
     prompt_3 = """Quand je te demande d'extraire des feuilles techniques d'un catalogue, tu le fais bien mais tu ne donnes pas les memes pages que celles
         du document, telles qu'elles sont présentes exactement.
         Comment faire pour avoir exactement les memes pages que celles du document ?"""
-
-
-    prompt_technical_sheets = """You are an expert document analyzer specializing in technical catalogs and specification sheets.
-        Your task is to analyze document content and identify boundaries between different technical 
-        sheets in product catalogs.
-
-        If you encounter a table of contents, use it to help you identify the boundaries of the technical sheets.
-
-        You must detect the language of the document and provide the output in the same language.
-        
-        Important rules:
-        - A technical sheet MUST describe exactly ONE product (not product categories or multiple products)
-        - A single technical sheet can span one or multiple pages
-        - Each boundary you identify should represent the start of a new product technical sheet
-        - Subtitles can identify different technical sheets for the same family of products (same title)
-        
-        Do not include any other information or explanations. Avoid unnecessary details, preambles, or conclusions.
-        
-        
-        Your output MUST be valid JSON in this exact format:
-        [
-            {
-                "product": "product title or code",
-                "confidence": "your confidence level (0.0-1.0)",
-                "pages": "a list of the page numbes where the technical sheet is located eg. [1, 2, 3]",
-                "reason": "explanation for boundary detection"
-            }
-        ]
-        """
 
 
 

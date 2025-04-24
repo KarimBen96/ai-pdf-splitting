@@ -353,7 +353,9 @@ class Pipeline:
 
 if __name__ == "__main__":
     # Example usage
-    pdf_path = "data/input/Catalogue-Tertu-Equipements-1-10.pdf"
+    pdf_filename_tertu_1_10 = "data/input/Catalogue-Tertu-Equipements-1-10.pdf"
+    pdf_filename_tertu_1_25 = "data/input/Catalogue-Tertu-Equipements-1-25.pdf"
+    pdf_filename_bordures = "data/input/CEL_Bordures_12-2020_V2.pdf"
 
     # Initialize pipeline
     mistral_api_key = os.environ.get("MISTRAL_API_KEY")
@@ -365,19 +367,8 @@ if __name__ == "__main__":
         output_dir="output",
     )
 
-    # Choose operation
-    print("\nChoose operation:")
-    print("1. Analyze document and print technical sheets")
-    print("2. Extract technical sheets to separate PDFs")
-
-    choice = input("Enter choice (1 or 2): ")
-
-    if choice == "1":
-        pipeline.extract_and_print(pdf_path)
-    elif choice == "2":
-        extracted_paths = pipeline.extract_sheets_to_pdf(pdf_path)
-        print(
-            f"\nExtracted {len(extracted_paths)} technical sheets as separate PDF files."
-        )
-    else:
-        print("Invalid choice")
+    extracted_paths = pipeline.extract_sheets_to_pdf(pdf_filename_tertu_1_10)
+    print(f"\nExtracted {len(extracted_paths)} technical sheets as separate PDF files.")
+    print("Paths to extracted files:")
+    for path in extracted_paths:
+        print(f"- {path}")

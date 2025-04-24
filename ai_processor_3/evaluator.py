@@ -10,15 +10,10 @@ from mistralai import Mistral
 import datauri
 from pprint import pprint
 
-# from prompt_list import prompt_technical_sheets, prompt_table_of_contents, prompt_technical_sheets_mistral
-# from document_processor import main
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-# from .prompt_list import (
-#     prompt_technical_sheets,
-#     prompt_table_of_contents,
-#     prompt_technical_sheets_mistral,
-# )
-# from .document_processor import main
+from ai_processor_3.prompt_list import prompt_technical_sheets, prompt_table_of_contents, prompt_technical_sheets_mistral
+from ai_processor_3.document_processor import main
 
 
 class Evaluator:
@@ -73,13 +68,12 @@ class Evaluator:
     def evaluate_with_llm(self, evaluation_report):
         """Send evaluation data to Mistral LLM for analysis."""
 
-        # Uncomment and use the client initialization in __init__
         # self.client = Mistral(api_key=api_key)
 
         # Format the evaluation data for the LLM
         evaluation_data = json.dumps(evaluation_report, indent=2)
 
-        # Create system prompt
+        # System prompt
         prompt = """
             You are an expert document evaluator specializing in technical catalogs and specification sheets.
             Your task is to evaluate the output of the document analyzer and provide feedback on its accuracy and completeness.
@@ -163,7 +157,6 @@ class Evaluator:
                 )
                 continue
 
-            # Si tout est correct
             evaluation_report.append(
                 {"product": product, "status": "Valid", "reason": reason}
             )
